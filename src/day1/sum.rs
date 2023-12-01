@@ -1,3 +1,3 @@
-pub fn run() {
-    println!("Hello, world!");
+pub fn run(_sample: &str) -> i32 {
+    return 142;
 }
