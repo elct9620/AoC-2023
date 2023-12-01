@@ -1,7 +1,13 @@
+use std::env;
+use std::fs;
 mod sum;
 
 fn main() {
-    let res = sum::run("");
+    let args: Vec<String> = env::args().collect();
+    let filename = &args[1];
+    let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
+
+    let res = sum::run(contents.as_str());
     println!("Sum: {}", res);
 }
 
