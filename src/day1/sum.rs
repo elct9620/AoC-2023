@@ -5,18 +5,11 @@ pub fn run(input: &str) -> i32 {
 }
 
 fn find_calibration_value(input: &str) -> i32 {
-    let left_num_idx = input.find(|c: char| c.is_digit(10));
-    let right_num_idx = input.rfind(|c: char| c.is_digit(10));
+    let digits: Vec<&str> = input.matches(char::is_numeric).collect();
+    let head = digits.first().unwrap_or(&"0");
+    let tail = digits.last().unwrap_or(&"0");
 
-    if left_num_idx.is_none() || right_num_idx.is_none() {
-        return 0;
-    }
-
-    let left_num_char = input.chars().nth(left_num_idx.unwrap()).unwrap();
-    let right_num_char = input.chars().nth(right_num_idx.unwrap()).unwrap();
-    let num = format!("{}{}", left_num_char, right_num_char)
-        .parse::<i32>()
-        .unwrap();
+    let num = format!("{}{}", head, tail).parse::<i32>().unwrap();
 
     return num;
 }
