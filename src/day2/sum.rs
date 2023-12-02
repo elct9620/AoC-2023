@@ -1,5 +1,3 @@
-use std::str::Split;
-
 struct Game {
     id: u32,
     red: u32,
@@ -66,25 +64,39 @@ fn decode_to_game(line: &str) -> Result<Game, ()> {
     let (id, actions) = extract_record(line)?;
     let mut game = Game::new(id);
     for action in actions {
-        let inputs = action.split(",");
-        for input in inputs {
-            let (count, color) = decode_input(input.trim());
-            game.put(color, count);
-        }
+        let (count, color) = decode_input(action);
+        game.put(color, count);
     }
 
     return Ok(game);
 }
 
-fn extract_record(record: &str) -> Result<(u32, Split<'_, &str>), ()> {
-    let parts = record.split(":").collect::<Vec<&str>>();
-    let id = match parts[0].trim().split(" ").nth(1) {
-        Some(id) => id.parse::<u32>().unwrap(),
-        None => return Err(()),
-    };
-    let actions = parts[1].split(";");
+fn extract_record(record: &str) -> Result<(u32, Vec<&str>), ()> {
+    let mut parts = record.split(":");
+
+    let id = parts.next().and_then(to_id).ok_or(())?;
+    let actions = parts.next().and_then(to_actions).ok_or(())?;
 
     return Ok((id, actions));
+}
+
+fn to_id(input: &str) -> Option<u32> {
+    return input
+        .trim()
+        .split(" ")
+        .nth(1)
+        .and_then(|id| id.parse::<u32>().ok());
+}
+
+fn to_actions(input: &str) -> Option<Vec<&str>> {
+    return Some(
+        input
+            .trim()
+            .split(";")
+            .flat_map(|action| action.split(","))
+            .map(|action| action.trim())
+            .collect::<Vec<&str>>(),
+    );
 }
 
 fn decode_input(input: &str) -> (u32, &str) {
