@@ -36,7 +36,7 @@ impl Game {
 pub fn part1(input: &str) -> u32 {
     let records = input
         .lines()
-        .map(|line| decode_to_game(line))
+        .map(|line| to_game(line))
         .map(|game| game.ok())
         .filter(|game| match game {
             Some(game) => game.is_possible(12, 13, 14),
@@ -50,7 +50,7 @@ pub fn part1(input: &str) -> u32 {
 pub fn part2(input: &str) -> u32 {
     let records = input
         .lines()
-        .map(|line| decode_to_game(line))
+        .map(|line| to_game(line))
         .filter(|game| match game {
             Ok(_) => true,
             Err(_) => false,
@@ -60,18 +60,21 @@ pub fn part2(input: &str) -> u32 {
     return records.sum();
 }
 
-fn decode_to_game(line: &str) -> Result<Game, ()> {
-    let (id, actions) = extract_record(line)?;
+fn to_game(line: &str) -> Result<Game, ()> {
+    let (id, actions) = extract(line)?;
     let mut game = Game::new(id);
-    for action in actions {
-        let (count, color) = decode_input(action);
-        game.put(color, count);
-    }
+
+    actions
+        .iter()
+        .map(|action| to_input(action))
+        .map(|input| input.ok())
+        .map(|input| input.unwrap())
+        .for_each(|(count, color)| game.put(color, count));
 
     return Ok(game);
 }
 
-fn extract_record(record: &str) -> Result<(u32, Vec<&str>), ()> {
+fn extract(record: &str) -> Result<(u32, Vec<&str>), ()> {
     let mut parts = record.split(":");
 
     let id = parts.next().and_then(to_id).ok_or(())?;
@@ -81,11 +84,7 @@ fn extract_record(record: &str) -> Result<(u32, Vec<&str>), ()> {
 }
 
 fn to_id(input: &str) -> Option<u32> {
-    return input
-        .trim()
-        .split(" ")
-        .nth(1)
-        .and_then(|id| id.parse::<u32>().ok());
+    return input.trim().split(" ").nth(1).and_then(to_number);
 }
 
 fn to_actions(input: &str) -> Option<Vec<&str>> {
@@ -94,13 +93,18 @@ fn to_actions(input: &str) -> Option<Vec<&str>> {
             .trim()
             .split(";")
             .flat_map(|action| action.split(","))
-            .map(|action| action.trim())
+            .map(str::trim)
             .collect::<Vec<&str>>(),
     );
 }
 
-fn decode_input(input: &str) -> (u32, &str) {
-    let count = input.split(" ").nth(0).unwrap().parse::<u32>().unwrap();
-    let color = input.split(" ").nth(1).unwrap();
-    return (count, color);
+fn to_input(input: &str) -> Result<(u32, &str), ()> {
+    let mut parts = input.split(" ");
+    let count = parts.next().and_then(to_number).ok_or(())?;
+    let color = parts.next().ok_or(())?;
+    return Ok((count, color));
+}
+
+fn to_number(input: &str) -> Option<u32> {
+    return input.trim().parse::<u32>().ok();
 }
