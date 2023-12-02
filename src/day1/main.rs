@@ -7,10 +7,10 @@ fn main() {
     let filename = &args[1];
     let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
-    let part1 = sum::run(contents.as_str());
+    let part1 = sum::part1(contents.as_str());
     println!("Part 1: {}", part1);
 
-    let part2 = sum::run2(contents.as_str());
+    let part2 = sum::part2(contents.as_str());
     println!("Part 2: {}", part2);
 }
 
@@ -19,7 +19,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_sample() {
+    fn test_day1_part1() {
         let sample = r#"
         1abc2
         pqr3stu8vwx
@@ -28,12 +28,12 @@ mod tests {
         "#;
 
         let expected = 142;
-        let actual = sum::run(sample);
+        let actual = sum::part1(sample);
         assert_eq!(expected, actual);
     }
 
     #[test]
-    fn test_letter() {
+    fn test_day1_part2() {
         let sample = r#"
         two1nine
         eightwothree
@@ -45,7 +45,7 @@ mod tests {
         "#;
 
         let expected = 281;
-        let actual = sum::run2(sample);
+        let actual = sum::part2(sample);
         assert_eq!(expected, actual);
     }
 }
