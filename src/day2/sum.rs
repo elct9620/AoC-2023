@@ -29,6 +29,10 @@ impl Game {
     fn is_possible(&self, red: u32, green: u32, blue: u32) -> bool {
         return self.red <= red && self.green <= green && self.blue <= blue;
     }
+
+    fn power(&self) -> u32 {
+        return self.red * self.green * self.blue;
+    }
 }
 
 pub fn part1(input: &str) -> u32 {
@@ -41,6 +45,19 @@ pub fn part1(input: &str) -> u32 {
             None => false,
         })
         .map(|game| game.unwrap().id);
+
+    return records.sum();
+}
+
+pub fn part2(input: &str) -> u32 {
+    let records = input
+        .lines()
+        .map(|line| decode_to_game(line))
+        .filter(|game| match game {
+            Ok(_) => true,
+            Err(_) => false,
+        })
+        .map(|game| game.unwrap().power());
 
     return records.sum();
 }
